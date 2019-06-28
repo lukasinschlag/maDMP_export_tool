@@ -7,9 +7,13 @@ import com.tuwien.ds19.o4g4.prod.data.DMPJSON;
 import com.tuwien.ds19.o4g4.prod.data.entity.Answer;
 import com.tuwien.ds19.o4g4.prod.data.entity.madmp.*;
 import com.tuwien.ds19.o4g4.prod.data.entity.Plan;
+import com.tuwien.ds19.o4g4.prod.util.DataAccessType;
+import com.tuwien.ds19.o4g4.prod.util.TFAnswer;
+import com.tuwien.ds19.o4g4.prod.util.TypeIdentifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,7 +25,7 @@ public class MaDMPService {
         this.answersRepository = answersRepository;
     }
 
-    public DMP getDMPFromPlan(Plan p){
+    public DMP getDMPFromPlan(Plan p) {
 
         DMP newDmp = new DMP();
         newDmp.setTitle(p.getTitle());
@@ -40,44 +44,49 @@ public class MaDMPService {
         return newDmp;
     }
 
-    public String getJSONDMP(DMP dmp){
+    public String getJSONDMP(DMP dmp) {
         Gson gson = new Gson();
         return gson.toJson(new DMPJSON(dmp));
     }
 
-    private void parseAnswers(Plan p, DMP dmp){
+    private void parseAnswers(Plan p, DMP dmp) {
         List<Answer> answers = answersRepository.findAllByPlan_id(p.getId());
 
         // check if this plan is from Horizon 2020 or FWF template
         int q_id = answers.get(0).getQuestion_id();
 
-        if(q_id >= HorizonTemplateConfig.QUESTION_ID_RANGE_START &&
-                q_id <= HorizonTemplateConfig.QUESTION_ID_RANGE_END){ // H2020
-
-
-        } else if(false){ // TODO FWF
+        if (q_id >= HorizonTemplateConfig.QUESTION_ID_RANGE_START &&
+                q_id <= HorizonTemplateConfig.QUESTION_ID_RANGE_END) { // H2020
+            Dataset ds = dmp.getDataset().get(0);
+            Distribution dst = ds.getDistribution().get(0);
+            for (Answer a : answers) {
+                parseH2020Answer(a, dmp, ds, dst);
+            }
+        } else if (false) { // TODO FWF
 
         }
     }
 
-    private void parseH2020Answer(Answer a, DMP dmp){
+    private void parseH2020Answer(Answer a, DMP dmp, Dataset ds, Distribution dist) {
         String text = a.getText();
-        Dataset ds = dmp.getDataset().get(0);
-        Distribution dist = ds.getDistribution().get(0);
-        switch(HorizonTemplateConfig.QUESTIONS_MAP.get(a.getQuestion_id())){
+
+        if(text.isEmpty()){
+            return;
+        }
+
+        switch (HorizonTemplateConfig.QUESTIONS_MAP.get(a.getQuestion_id())) {
             case 1:
             case 4:
-            case 6:
                 ds.setDescription(text);
                 break;
             case 2:
-                for(Dataset.DatasetTypeEnum dt : Dataset.DatasetTypeEnum.values()){
-                    if(text.toLowerCase().contains(dt.name())){
+                for (Dataset.DatasetTypeEnum dt : Dataset.DatasetTypeEnum.values()) {
+                    if (text.toLowerCase().contains(dt.name())) {
                         ds.setType(dt.name());
                     }
                 }
-                for(Distribution.DatasetFormat df : Distribution.DatasetFormat.values()){
-                    if(text.toLowerCase().contains(df.name())){
+                for (Distribution.DatasetFormat df : Distribution.DatasetFormat.values()) {
+                    if (text.toLowerCase().contains(df.name())) {
                         dist.setFormat(df.name());
                     }
                 }
@@ -88,36 +97,108 @@ public class MaDMPService {
                 break;
             case 5:
                 int size = Integer.parseInt(text.replaceAll("[^0-9]", ""));
-                if(text.toLowerCase().contains("kb")){
+                if (text.toLowerCase().contains("kb")) {
                     size = size * 1024;
-                } else if (text.toLowerCase().contains("mb")){
+                } else if (text.toLowerCase().contains("mb")) {
                     size = size * 1024 * 1024;
-                } else if (text.toLowerCase().contains("gb")){
+                } else if (text.toLowerCase().contains("gb")) {
                     size = size * 1024 * 1024 * 1024;
                 }
                 dist.setByteSize(size);
                 break;
+            case 6:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("useful_to")));
+                break;
             case 7:
-
+                Dataset_Id dataset_id = new Dataset_Id(text);
+                dataset_id.setdataset_id_type(TypeIdentifier.checkType(text));
+                ds.setDataset_id(dataset_id);
                 break;
             case 8:
-
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("naming_convention")));
                 break;
             case 9:
-
+                if(text.contains(",")) {
+                    ds.setKeyword(Arrays.asList(text.split(",")));
+                } else if(text.contains(";")){
+                    ds.setKeyword(Arrays.asList(text.split(";")));
+                } else {
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add(text);
+                    ds.setKeyword(list);
+                }
+                break;
+            case 10:
+                if(text.contains(TFAnswer.yes.name())){
+                    dist.getHost().setSupports_versioning(TFAnswer.yes.name());
+                } else if (text.contains(TFAnswer.no.name())){
+                    dist.getHost().setSupports_versioning(TFAnswer.no.name());
+                } else {
+                    dist.getHost().setSupports_versioning(TFAnswer.unknown.name());
+                }
+                break;
+            case 11:
+            case 24:
+            case 25:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("metadata_standard")));
+                break;
+            case 12:
+                if(text.toLowerCase().contains(DataAccessType.open.name())){
+                    dist.setData_access(DataAccessType.open.name());
+                } else if (text.toLowerCase().contains(DataAccessType.closed.name())){
+                    dist.setData_access(DataAccessType.closed.name());
+                } else if (text.toLowerCase().contains(DataAccessType.shared.name())){
+                    dist.setData_access(DataAccessType.shared.name());
+                }
+                if(text.toLowerCase().contains("personal")){
+                    ds.setPersonalData(TFAnswer.yes.name());
+                } else {
+                    ds.setPersonalData(TFAnswer.unknown.name());
+                    if(text.toLowerCase().contains("sensitive")){
+                        ds.setSensitiveData(TFAnswer.yes.name());
+                    } else {
+                        ds.setSensitiveData(TFAnswer.unknown.name());
+                    }
+                }
+                break;
+            case 13:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("multi_beneficiary_project")));
+                break;
+            case 14:
+                dist.getHost().setStorage_type(text);
+                break;
+            case 15:
+            case 16:
+            case 17:
+                ds.getTechnicalResource().add(new TechnicalResource(text, new TextType_Id("software_tools")));
+                break;
+            case 18:
+                dist.getHost().setTitle(text);
+                break;
+            case 19:
+                dist.getHost().setDescription(text);
+                break;
+            case 20:
+            case 21:
+                dist.setDescription(text);
+                break;
+            case 22:
+            case 23:
+                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("AccessAuthorization", text));
+                break;
+            case 26:
+            case 27:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("standard_vocabulary")));
                 break;
         }
     }
 
-    private void setContact(Plan p, DMP dmp){
-        if(!p.getPrincipal_investigator().isEmpty()){
+    private void setContact(Plan p, DMP dmp) {
+        if (!p.getPrincipal_investigator().isEmpty()) {
             Contact_Id cid = null;
-            if(!p.getPrincipal_investigator_identifier().isEmpty()){
+            if (!p.getPrincipal_investigator_identifier().isEmpty()) {
                 cid = new Contact_Id(p.getPrincipal_investigator_identifier());
-
-                if(cid.getContact_id().toLowerCase().contains("orcid")){
-                    cid.setContact_id_type("HTTP-ORCID");
-                }
+                cid.setContact_id_type(TypeIdentifier.checkType(cid.getContact_id()));
             }
             dmp.setContact(new Contact(
                     p.getPrincipal_investigator(),
@@ -127,8 +208,8 @@ public class MaDMPService {
         }
     }
 
-    private void setProject(Plan p, DMP dmp){
-        if(!p.getTitle().isEmpty()){
+    private void setProject(Plan p, DMP dmp) {
+        if (!p.getTitle().isEmpty()) {
             Project project = new Project(p.getTitle(), p.getDescription());
             project.setFunding(getFunding(p));
             List<Project> projectList = new ArrayList<>();
@@ -137,12 +218,12 @@ public class MaDMPService {
         }
     }
 
-    private Funding getFunding(Plan p){
+    private Funding getFunding(Plan p) {
         Funding funding = new Funding();
-        if(!p.getFunder_name().isEmpty()){
+        if (!p.getFunder_name().isEmpty()) {
             funding.setFunderID(p.getFunder_name());
         }
-        if(!p.getGrant_number().isEmpty()){
+        if (!p.getGrant_number().isEmpty()) {
             funding.setGrantID(p.getGrant_number());
         }
         return funding;

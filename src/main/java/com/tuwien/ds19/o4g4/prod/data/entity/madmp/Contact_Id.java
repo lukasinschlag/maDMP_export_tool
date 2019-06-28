@@ -1,6 +1,6 @@
 package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 
-public class Contact_Id {
+public class Contact_Id implements TypedIdentifier {
 
     private String contact_id;
     private String contact_id_type;
