@@ -1,6 +1,6 @@
 package com.tuwien.ds19.o4g4.prod.data;
 
-import com.tuwien.ds19.o4g4.prod.data.entity.DMP;
+import com.tuwien.ds19.o4g4.prod.data.entity.madmp.DMP;
 
 public class DMPJSON {
 

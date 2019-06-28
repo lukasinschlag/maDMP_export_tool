@@ -1,9 +1,9 @@
-package com.tuwien.ds19.o4g4.prod.data.entity;
+package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 
 public class Contact_Id {
 
     private String contact_id;
-    private String contact_id_type = "HTTP-ORCID";
+    private String contact_id_type;
 
     public Contact_Id(String contact_id) {
         this.contact_id = contact_id;

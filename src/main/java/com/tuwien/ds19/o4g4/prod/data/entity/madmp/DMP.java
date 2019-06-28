@@ -1,4 +1,4 @@
-package com.tuwien.ds19.o4g4.prod.data.entity;
+package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 
 import java.util.Date;
 import java.util.List;
@@ -6,16 +6,21 @@ import java.util.List;
 public class DMP {
 
     private String title;
+    private String description;
     private String language;
     private Date created;
     private Date modified;
 
     private Contact contact;
 
+    private List<DMStaff> dmStaff;
     private List<Project> project;
+    private List<Cost> cost;
+    private List<Dataset> dataset;
 
-    public DMP() {
-    }
+    //TODO: ethicalIssues
+
+    public DMP() {}
 
     public String getTitle() {
         return title;
@@ -63,5 +68,37 @@ public class DMP {
 
     public void setProject(List<Project> project) {
         this.project = project;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<DMStaff> getDmStaff() {
+        return dmStaff;
+    }
+
+    public void setDmStaff(List<DMStaff> dmStaff) {
+        this.dmStaff = dmStaff;
+    }
+
+    public List<Cost> getCost() {
+        return cost;
+    }
+
+    public void setCost(List<Cost> cost) {
+        this.cost = cost;
+    }
+
+    public List<Dataset> getDataset() {
+        return dataset;
+    }
+
+    public void setDataset(List<Dataset> dataset) {
+        this.dataset = dataset;
     }
 }

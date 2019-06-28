@@ -32,7 +32,7 @@
         <tbody>
 
         <c:forEach items="${set.getPlanList()}" var="item">
-            <spring:url value="/json2/${item.getId()}" var="jsonUrl" />
+            <spring:url value="/json/${item.getId()}" var="jsonUrl" />
             <tr>
                 <th scope="row">${item.getId()}</th>
                 <td>${item.getTitle()}</td>
