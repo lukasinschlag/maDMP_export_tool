@@ -7,7 +7,7 @@ public final class Patterns {
     private Patterns(){}
 
     public static Pattern getMail(){
-        return Pattern.compile("(^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)");
+        return Pattern.compile("([a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9_-]+)");
     }
 
     public static Pattern getORCID(){
