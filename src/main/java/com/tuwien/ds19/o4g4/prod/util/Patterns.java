@@ -2,7 +2,9 @@ package com.tuwien.ds19.o4g4.prod.util;
 
 import java.util.regex.Pattern;
 
-public class Patterns {
+public final class Patterns {
+
+    private Patterns(){}
 
     public static Pattern getMail(){
         return Pattern.compile("(^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)");
