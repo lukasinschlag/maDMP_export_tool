@@ -1,6 +1,7 @@
 package com.tuwien.ds19.o4g4.prod;
 
 import com.google.gson.Gson;
+import com.joestelmach.natty.Parser;
 import com.tuwien.ds19.o4g4.prod.config.HorizonTemplateConfig;
 import com.tuwien.ds19.o4g4.prod.data.AnswersRepository;
 import com.tuwien.ds19.o4g4.prod.data.DMPJSON;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -210,6 +212,48 @@ public class MaDMPService {
                 break;
             case 27:
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("ontology_mappings")));
+                break;
+            case 28:
+                Pattern pURI = Pattern.compile("(\\w+:(/?/?)[^\\s]+)");
+                Matcher mURI = pURI.matcher(text);
+                if(mURI.matches()) {
+                    if(dist.getLicense().isEmpty()){
+                        dist.getLicense().add(new License());
+                    }
+                    dist.getLicense().get(0).setLicense_ref(mURI.group(1));
+                }
+                break;
+            case 29:
+                if(dist.getLicense().isEmpty()){
+                    dist.getLicense().add(new License());
+                }
+                List<Date> dates = new Parser().parse(text).get(0).getDates();
+                if(!dates.isEmpty()) {
+                    dist.getLicense().get(0).setStartDate(dates.get(0));
+                }
+                break;
+            case 30:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_reusable")));
+                break;
+            case 31:
+                List<Date> dates2 = new Parser().parse(text).get(0).getDates();
+                if(!dates2.isEmpty()) {
+                    dist.setAvailableTill(dates2.get(0));
+                }
+                break;
+            case 32:
+                ds.setDataQualityAssurance(text);
+                break;
+            case 33:
+                Cost cost = new Cost("Making data FAIR");
+                if(text.contains("€") || text.toLowerCase().contains("eur")){
+                    cost.setCostUnit("EUR");
+                } else if(text.contains("$") || text.toLowerCase().contains("usd")){
+                    cost.setCostUnit("USD");
+                }
+                break;
+            case 34:
+
                 break;
         }
     }
