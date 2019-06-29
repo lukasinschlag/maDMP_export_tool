@@ -9,6 +9,7 @@ import com.tuwien.ds19.o4g4.prod.data.entity.Answer;
 import com.tuwien.ds19.o4g4.prod.data.entity.madmp.*;
 import com.tuwien.ds19.o4g4.prod.data.entity.Plan;
 import com.tuwien.ds19.o4g4.prod.util.DataAccessType;
+import com.tuwien.ds19.o4g4.prod.util.Patterns;
 import com.tuwien.ds19.o4g4.prod.util.TFAnswer;
 import com.tuwien.ds19.o4g4.prod.util.TypeIdentifier;
 import org.slf4j.Logger;
@@ -102,8 +103,7 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("reuse_existing_data")));
                 break;
             case 4:
-                Pattern p = Pattern.compile("((https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
-                Matcher m = p.matcher(text);
+                Matcher m = Patterns.getURL().matcher(text);
                 if(m.matches()) {
                     dist.setAccessURL(m.group(1));
                     dist.setDownloadURL(m.group(1));
@@ -124,8 +124,7 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("useful_to")));
                 break;
             case 7:
-                Pattern pattern = Pattern.compile("(10.\\d{4,9}.[\\w.-]+)");
-                Matcher matcher = pattern.matcher(text);
+                Matcher matcher = Patterns.getDOI().matcher(text);
                 Dataset_Id dataset_id = new Dataset_Id(matcher.find()? matcher.group(1) : text);
                 dataset_id.setdataset_id_type(TypeIdentifier.checkType(text));
                 ds.setDataset_id(dataset_id);
@@ -214,8 +213,7 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("ontology_mappings")));
                 break;
             case 28:
-                Pattern pURI = Pattern.compile("(\\w+:(/?/?)[^\\s]+)");
-                Matcher mURI = pURI.matcher(text);
+                Matcher mURI = Patterns.getURI().matcher(text);
                 if(mURI.matches()) {
                     if(dist.getLicense().isEmpty()){
                         dist.getLicense().add(new License());
@@ -253,7 +251,24 @@ public class MaDMPService {
                 }
                 break;
             case 34:
-
+                Funding funding = new Funding();
+                funding.setFunderID(text);
+                break;
+            case 35:
+                Matcher mORCID = Patterns.getORCID().matcher(text);
+                DMStaff dmStaff = new DMStaff();
+                if(mORCID.matches()){ // DMStaff orcid?
+                    String id = mORCID.group(1);
+                    dmStaff.setUserID(new User_Id(id));
+                    text = text.replace(id, "");
+                }
+                Matcher mMail = Patterns.getMail().matcher(text);
+                if(mMail.matches()){ // DMStaff mail?
+                    String mail = mMail.group(1);
+                    dmStaff.setMbox(mail);
+                    text = text.replace(mail, "");
+                }
+                dmStaff.setName(text);
                 break;
         }
     }
@@ -276,7 +291,7 @@ public class MaDMPService {
     private void setProject(Plan p, DMP dmp) {
         if (!p.getTitle().isEmpty()) {
             Project project = new Project(p.getTitle(), p.getDescription());
-            project.setFunding(getFunding(p));
+            project.addFunding(getFunding(p));
             List<Project> projectList = new ArrayList<>();
             projectList.add(project);
             dmp.setProject(projectList);

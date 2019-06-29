@@ -7,10 +7,7 @@ public class DMStaff {
 
     private User_Id userID;
 
-    public DMStaff(String name, String mbox, User_Id userID) {
-        this.name = name;
-        this.mbox = mbox;
-        this.userID = userID;
+    public DMStaff() {
     }
 
     public String getName() {
