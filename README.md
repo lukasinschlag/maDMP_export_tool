@@ -1,5 +1,7 @@
 # maDMP_export_tool
 
+In this project the RDA DMP Common Standard was evaluated by mapping it to funder templates and by implementing a tool
+that exports information from existing DMP tools into maDMP format.
 
 # Mapping of questions to maDMP fields
 ## Horizon 2020
@@ -161,4 +163,17 @@ Description of the Action (DoA).
 `Metadata:data_management_procedures`
 
 
+# How the Tool works and its Configuration
+
+To run the tool first a connection to the mysql database has to be made. Therefore, go to the ```src\main\resources\application.properties``` file. Here you find three values to configure:
+```
+spring.datasource.url=jdbc:mysql://localhost:3306/DATABASE-NAME?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Vienna
+spring.datasource.username=DATABASE-USERNAME
+spring.datasource.password=DATABASE-USERPASSWORD
+```
+Replace ```DATABASE-NAME``` with the name given to the Roadmap database. Then set the username and the (if required) password.
+
+With this the configuration is done. Upon starting the application a website under ```localhost:8080``` can be accessed. 
+
+Here all available DMPs are represented. Simply click the Download button to get the maDMP.
 
