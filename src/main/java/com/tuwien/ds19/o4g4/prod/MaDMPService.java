@@ -269,6 +269,51 @@ public class MaDMPService {
                     text = text.replace(mail, "");
                 }
                 dmStaff.setName(text);
+                List<DMStaff> dmStaffs = new ArrayList<>();
+                dmStaffs.add(dmStaff);
+                dmp.setDmStaff(dmStaffs);
+                break;
+            case 36:
+                ds.setPreservationStatement(text);
+                break;
+            case 37:
+                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("DataSecurity", text));
+                break;
+            case 38:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_stored_securely")));
+                break;
+            case 39:
+                Matcher mURL = Patterns.getURL().matcher(text);
+                if(mURL.matches()) {
+                    String url = mURL.group(1);
+                    dmp.setEthicalIssuesReport(url);
+                    text = text.replace(url, "");
+                }
+                if(text.contains(TFAnswer.yes.name())){
+                    dmp.setEthicalIssuesExist(TFAnswer.yes.name());
+                    text = text.replace(TFAnswer.yes.name(),"");
+                } else if (text.contains(TFAnswer.no.name())){
+                    dmp.setEthicalIssuesExist(TFAnswer.no.name());
+                    text = text.replace(TFAnswer.no.name(),"");
+                } else {
+                    dmp.setEthicalIssuesExist(TFAnswer.unknown.name());
+                }
+                dmp.setEthicalIssuesDescription(text);
+                break;
+            case 40:
+                if(dmp.getEthicalIssuesReport().isEmpty()){
+                    Matcher mURLrep = Patterns.getURL().matcher(text);
+                    if(mURLrep.matches()) {
+                        String url = mURLrep.group(1);
+                        dmp.setEthicalIssuesReport(url);
+                    }
+                }
+                break;
+            case 41:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("personal_data_sharing_consent")));
+                break;
+            case 42:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_management_procedures")));
                 break;
         }
     }
