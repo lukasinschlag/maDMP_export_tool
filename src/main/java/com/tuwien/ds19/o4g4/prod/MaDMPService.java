@@ -194,7 +194,7 @@ public class MaDMPService {
                 dist.getHost().setTitle(text);
                 break;
             case 19:
-                dist.getHost().setDescription("Appropriate arrangements with the identified repository explored:" + text);
+                dist.getHost().setDescription("Appropriate arrangements with the identified repository explored: " + text);
                 break;
             case 20:
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("access_provided")));
@@ -296,12 +296,12 @@ public class MaDMPService {
                     dmp.setEthicalIssuesReport(url);
                     text = text.replace(url, "");
                 }
-                if(text.contains(TFAnswer.yes.name())){
+                if(text.toLowerCase().contains(TFAnswer.yes.name())){
                     dmp.setEthicalIssuesExist(TFAnswer.yes.name());
-                    text = text.replace(TFAnswer.yes.name(),"");
-                } else if (text.contains(TFAnswer.no.name())){
+                    text = text.toLowerCase().replace(TFAnswer.yes.name(),"");
+                } else if (text.toLowerCase().contains(TFAnswer.no.name())){
                     dmp.setEthicalIssuesExist(TFAnswer.no.name());
-                    text = text.replace(TFAnswer.no.name(),"");
+                    text = text.toLowerCase().replace(TFAnswer.no.name(),"");
                 } else {
                     dmp.setEthicalIssuesExist(TFAnswer.unknown.name());
                 }
