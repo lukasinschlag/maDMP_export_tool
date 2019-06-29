@@ -301,7 +301,7 @@ public class MaDMPService {
                 dmp.setEthicalIssuesDescription(text);
                 break;
             case 40:
-                if(dmp.getEthicalIssuesReport().isEmpty()){
+                if(dmp.getEthicalIssuesReport() == null || dmp.getEthicalIssuesReport().isEmpty()){
                     Matcher mURLrep = Patterns.getURL().matcher(text);
                     if(mURLrep.matches()) {
                         String url = mURLrep.group(1);
