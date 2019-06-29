@@ -102,65 +102,63 @@ interoperability?
 
 #### Increase data re-use (through clarifying licenses) ####
 - How will the data be licensed to permit the widest re-use possible?
--> License:licence_ref
+`License:licence_ref`
 
 - When will the data be made available for re-use? If an embargo is sought to give time to publish or seek patents, specify why and how long this will apply, bearing in mind that research data should be made available as soon as possible.
--> Licence:startDate
+`Licence:startDate`
 
 - Are the data produced and/or used in the project useable by third parties, in particular after the end of the
 project? If the re-use of some data is restricted, explain why. 
--> Distribution:dataAccess
+`Metadata:data_reusable`
 
 - How long is it intended that the data remains re-usable?
--> Distribution:availableTill
+`Distribution:availableTill`
 
 - Are data quality assurance processes described?
--> Dataset:dataQualityAssurance
-
-- Further to the FAIR principles, DMPs should also address:
--> TODO??
+`Dataset:dataQualityAssurance`
 
 ### Allocation of resources ###
 -  What are the costs for making data FAIR in your project?
--> Cost:costType
--> Cost:costValue
--> Cost:costUnit
+`Cost:costValue`
+`Cost:costUnit`
 
 - How will these be covered? Note that costs related to open access to research data are eligible as part of the Horizon 2020 grant (if compliant with the Grant Agreement conditions).
--> Funding:funderID
+`Funding:funderID`
 
 - Who will be responsible for data management in your project?
--> DMStaff:name/mbox/userID
+`DMStaff:name`
+`DMStaff:mbox`
+`DMStaff:userID`
 
 - Are the resources for long term preservation discussed (costs and potential value, who decides and how what
 data will be kept and for how long)?
--> Dataset:PreservationStatement
+`Dataset:preservationStatement`
 
 ### Data security ###
 - What provisions are in place for data security (including data recovery as well as secure storage and transfer of
 sensitive data)?
--> SecurityAndPrivacy:String/description
+`SecurityAndPrivacy:DataSecurity`
 
 - Is the data safely stored in certified repositories for long term preservation and curation?
--> Host:Title
+`Metadata:data_stored_securely`
 
 ### Ethical aspects ###
 - Are there any ethical or legal issues that can have an impact on data sharing? These can also be discussed in
 the context of the ethics review. If relevant, include references to ethics deliverables and ethics chapter in the
 Description of the Action (DoA).
--> Dataset:ethicalIssuesExist
--> Dataset:ethicalIssuesReport
--> Dataset:ethicalIssuesDescription
+`DMP:ethicalIssuesExist`
+`DMP:ethicalIssuesReport`
+`DMP:ethicalIssuesDescription`
 
 - Projects participating to the ORDP might present information relevant to the ethical aspects (data protection) in the DMP. In such a case, the ethics chapter of the DoA may simply refer to the DMP for more information on the details of the ethics aspects related to data. 
--> Dataset:ethicalIssuesReport
+`DMP:ethicalIssuesReport`
 
 - Is informed consent for data sharing and long term preservation included in questionnaires dealing with personal data?
--> Dataset:personalData
+`Metadata:personal_data_sharing_consent`
 
 ### Other ###
 - Do you make use of other national/funder/sectorial/departmental procedures for data management? If yes, which ones?
--> DEFUQ?? TODO
+`Metadata:data_management_procedures`
 
 
 
