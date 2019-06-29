@@ -261,6 +261,13 @@ public class MaDMPService {
                     String id = mORCID.group(1);
                     dmStaff.setUserID(new User_Id(id));
                     text = text.replace(id, "");
+                } else {
+                    Matcher mURLo = Patterns.getURL().matcher(text);
+                    if(mURLo.matches()){ // DMStaff url?
+                        String id = mURLo.group(1);
+                        dmStaff.setUserID(new User_Id(id, "HTTP-ORCID"));
+                        text = text.replace(id, "");
+                    }
                 }
                 Matcher mMail = Patterns.getMail().matcher(text);
                 if(mMail.matches()){ // DMStaff mail?

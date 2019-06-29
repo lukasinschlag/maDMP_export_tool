@@ -9,6 +9,11 @@ public class User_Id {
         this.user_id = user_id;
     }
 
+    public User_Id(String user_id, String user_id_type) {
+        this.user_id = user_id;
+        this.user_id_type = user_id_type;
+    }
+
     public String getUser_id() {
         return user_id;
     }
