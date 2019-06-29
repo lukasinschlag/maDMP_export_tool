@@ -134,9 +134,9 @@ public class MaDMPService {
                 break;
             case 9:
                 if (text.contains(",")) {
-                    ds.setKeyword(Arrays.asList(text.split(",")));
+                    ds.setKeyword(Arrays.asList(text.trim().split("\\s*,\\s*")));
                 } else if (text.contains(";")) {
-                    ds.setKeyword(Arrays.asList(text.split(";")));
+                    ds.setKeyword(Arrays.asList(text.trim().split("\\s*;\\s*")));
                 } else {
                     ArrayList<String> list = new ArrayList<>();
                     list.add(text);
