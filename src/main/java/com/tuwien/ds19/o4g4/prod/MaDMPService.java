@@ -257,21 +257,25 @@ public class MaDMPService {
             case 35:
                 Matcher mORCID = Patterns.getORCID().matcher(text);
                 DMStaff dmStaff = new DMStaff();
-                if(mORCID.matches()){ // DMStaff orcid?
+                logger.info("DMStaff: " + text);
+                if(mORCID.find()){ // DMStaff orcid?
                     String id = mORCID.group(1);
+                    logger.info("orcid matches: " + id);
                     dmStaff.setUserID(new User_Id(id));
                     text = text.replace(id, "");
                 } else {
                     Matcher mURLo = Patterns.getURL().matcher(text);
-                    if(mURLo.matches()){ // DMStaff url?
+                    if(mURLo.find()){ // DMStaff url?
                         String id = mURLo.group(1);
+                        logger.info("url matches: " + id);
                         dmStaff.setUserID(new User_Id(id, "HTTP-ORCID"));
                         text = text.replace(id, "");
                     }
                 }
                 Matcher mMail = Patterns.getMail().matcher(text);
-                if(mMail.matches()){ // DMStaff mail?
+                if(mMail.find()){ // DMStaff mail?
                     String mail = mMail.group(1);
+                    logger.info("mail matches: " + mail);
                     dmStaff.setMbox(mail);
                     text = text.replace(mail, "");
                 }
