@@ -3,7 +3,7 @@ package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 public class User_Id {
     
     private String user_id;
-    private String user_id_type = "HTTP-ORCID";
+    private String user_id_type = "ORCID";
 
     public User_Id(String user_id) {
         this.user_id = user_id;

@@ -1,5 +1,9 @@
 package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class Distribution {
 
     private String title;
@@ -9,11 +13,15 @@ public class Distribution {
     private String downloadURL;
     private String data_access;
     private int byteSize;
+    private Date availableTill;
 
     private Host host;
 
+    private List<License> license;
+
     public Distribution() {
         this.host = new Host();
+        license = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -82,6 +90,22 @@ public class Distribution {
 
     public void setData_access(String data_access) {
         this.data_access = data_access;
+    }
+
+    public List<License> getLicense() {
+        return license;
+    }
+
+    public void setLicense(List<License> license) {
+        this.license = license;
+    }
+
+    public Date getAvailableTill() {
+        return availableTill;
+    }
+
+    public void setAvailableTill(Date availableTill) {
+        this.availableTill = availableTill;
     }
 
     public enum DatasetFormat {

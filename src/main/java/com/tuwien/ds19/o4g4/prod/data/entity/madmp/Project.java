@@ -1,6 +1,8 @@
 package com.tuwien.ds19.o4g4.prod.data.entity.madmp;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Project {
 
@@ -8,19 +10,12 @@ public class Project {
     private String description;
     private Date projectStart;
     private Date projectEnd;
-    private Funding funding;
+    private List<Funding> funding;
 
     public Project(String title, String description) {
         this.title = title;
         this.description = description;
-    }
-
-    public Project(String title, String description, Date projectStart, Date projectEnd, Funding funding) {
-        this.title = title;
-        this.description = description;
-        this.projectStart = projectStart;
-        this.projectEnd = projectEnd;
-        this.funding = funding;
+        this.funding = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -39,12 +34,12 @@ public class Project {
         this.description = description;
     }
 
-    public Funding getFunding() {
+    public List<Funding> getFunding() {
         return funding;
     }
 
-    public void setFunding(Funding funding) {
-        this.funding = funding;
+    public void addFunding(Funding funding) {
+        this.funding.add(funding);
     }
 
     public Date getProjectStart() {
