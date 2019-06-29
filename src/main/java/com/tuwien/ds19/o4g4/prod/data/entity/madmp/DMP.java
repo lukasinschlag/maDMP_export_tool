@@ -18,7 +18,9 @@ public class DMP {
     private List<Cost> cost;
     private List<Dataset> dataset;
 
-    //TODO: ethicalIssues
+    private String ethicalIssuesExist;
+    private String ethicalIssuesReport;
+    private String ethicalIssuesDescription;
 
     public DMP() {}
 
@@ -100,5 +102,29 @@ public class DMP {
 
     public void setDataset(List<Dataset> dataset) {
         this.dataset = dataset;
+    }
+
+    public String getEthicalIssuesExist() {
+        return ethicalIssuesExist;
+    }
+
+    public void setEthicalIssuesExist(String ethicalIssuesExist) {
+        this.ethicalIssuesExist = ethicalIssuesExist;
+    }
+
+    public String getEthicalIssuesReport() {
+        return ethicalIssuesReport;
+    }
+
+    public void setEthicalIssuesReport(String ethicalIssuesReport) {
+        this.ethicalIssuesReport = ethicalIssuesReport;
+    }
+
+    public String getEthicalIssuesDescription() {
+        return ethicalIssuesDescription;
+    }
+
+    public void setEthicalIssuesDescription(String ethicalIssuesDescription) {
+        this.ethicalIssuesDescription = ethicalIssuesDescription;
     }
 }

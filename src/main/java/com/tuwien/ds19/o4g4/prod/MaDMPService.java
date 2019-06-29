@@ -79,7 +79,7 @@ public class MaDMPService {
     private void parseH2020Answer(Answer a, DMP dmp, Dataset ds, Distribution dist) {
         String text = a.getText();
 
-        if(text.isEmpty()){
+        if (text.isEmpty()) {
             return;
         }
 
@@ -104,7 +104,7 @@ public class MaDMPService {
                 break;
             case 4:
                 Matcher m = Patterns.getURL().matcher(text);
-                if(m.matches()) {
+                if (m.matches()) {
                     dist.setAccessURL(m.group(1));
                     dist.setDownloadURL(m.group(1));
                 }
@@ -125,7 +125,7 @@ public class MaDMPService {
                 break;
             case 7:
                 Matcher matcher = Patterns.getDOI().matcher(text);
-                Dataset_Id dataset_id = new Dataset_Id(matcher.find()? matcher.group(1) : text);
+                Dataset_Id dataset_id = new Dataset_Id(matcher.find() ? matcher.group(1) : text);
                 dataset_id.setdataset_id_type(TypeIdentifier.checkType(text));
                 ds.setDataset_id(dataset_id);
                 break;
@@ -133,9 +133,9 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("naming_convention")));
                 break;
             case 9:
-                if(text.contains(",")) {
+                if (text.contains(",")) {
                     ds.setKeyword(Arrays.asList(text.split(",")));
-                } else if(text.contains(";")){
+                } else if (text.contains(";")) {
                     ds.setKeyword(Arrays.asList(text.split(";")));
                 } else {
                     ArrayList<String> list = new ArrayList<>();
@@ -144,9 +144,9 @@ public class MaDMPService {
                 }
                 break;
             case 10:
-                if(text.contains(TFAnswer.yes.name())){
+                if (text.contains(TFAnswer.yes.name())) {
                     dist.getHost().setSupports_versioning(TFAnswer.yes.name());
-                } else if (text.contains(TFAnswer.no.name())){
+                } else if (text.contains(TFAnswer.no.name())) {
                     dist.getHost().setSupports_versioning(TFAnswer.no.name());
                 } else {
                     dist.getHost().setSupports_versioning(TFAnswer.unknown.name());
@@ -158,18 +158,18 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("metadata_standard")));
                 break;
             case 12:
-                if(text.toLowerCase().contains(DataAccessType.open.name())){
+                if (text.toLowerCase().contains(DataAccessType.open.name())) {
                     dist.setData_access(DataAccessType.open.name());
-                } else if (text.toLowerCase().contains(DataAccessType.closed.name())){
+                } else if (text.toLowerCase().contains(DataAccessType.closed.name())) {
                     dist.setData_access(DataAccessType.closed.name());
-                } else if (text.toLowerCase().contains(DataAccessType.shared.name())){
+                } else if (text.toLowerCase().contains(DataAccessType.shared.name())) {
                     dist.setData_access(DataAccessType.shared.name());
                 }
-                if(text.toLowerCase().contains("personal")){
+                if (text.toLowerCase().contains("personal")) {
                     ds.setPersonalData(TFAnswer.yes.name());
                 } else {
                     ds.setPersonalData(TFAnswer.unknown.name());
-                    if(text.toLowerCase().contains("sensitive")){
+                    if (text.toLowerCase().contains("sensitive")) {
                         ds.setSensitiveData(TFAnswer.yes.name());
                     } else {
                         ds.setSensitiveData(TFAnswer.unknown.name());
@@ -194,7 +194,7 @@ public class MaDMPService {
                 dist.getHost().setTitle(text);
                 break;
             case 19:
-                dist.getHost().setDescription("Appropriate arrangements with the identified repository explored:" + text);
+                dist.getHost().setDescription("Appropriate arrangements with the identified repository explored: " + text);
                 break;
             case 20:
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("access_provided")));
@@ -214,19 +214,19 @@ public class MaDMPService {
                 break;
             case 28:
                 Matcher mURI = Patterns.getURI().matcher(text);
-                if(mURI.matches()) {
-                    if(dist.getLicense().isEmpty()){
+                if (mURI.matches()) {
+                    if (dist.getLicense().isEmpty()) {
                         dist.getLicense().add(new License());
                     }
                     dist.getLicense().get(0).setLicense_ref(mURI.group(1));
                 }
                 break;
             case 29:
-                if(dist.getLicense().isEmpty()){
+                if (dist.getLicense().isEmpty()) {
                     dist.getLicense().add(new License());
                 }
                 List<Date> dates = new Parser().parse(text).get(0).getDates();
-                if(!dates.isEmpty()) {
+                if (!dates.isEmpty()) {
                     dist.getLicense().get(0).setStartDate(dates.get(0));
                 }
                 break;
@@ -235,7 +235,7 @@ public class MaDMPService {
                 break;
             case 31:
                 List<Date> dates2 = new Parser().parse(text).get(0).getDates();
-                if(!dates2.isEmpty()) {
+                if (!dates2.isEmpty()) {
                     dist.setAvailableTill(dates2.get(0));
                 }
                 break;
@@ -244,9 +244,9 @@ public class MaDMPService {
                 break;
             case 33:
                 Cost cost = new Cost("Making data FAIR");
-                if(text.contains("€") || text.toLowerCase().contains("eur")){
+                if (text.contains("€") || text.toLowerCase().contains("eur")) {
                     cost.setCostUnit("EUR");
-                } else if(text.contains("$") || text.toLowerCase().contains("usd")){
+                } else if (text.contains("$") || text.toLowerCase().contains("usd")) {
                     cost.setCostUnit("USD");
                 }
                 break;
@@ -255,20 +255,76 @@ public class MaDMPService {
                 funding.setFunderID(text);
                 break;
             case 35:
-                Matcher mORCID = Patterns.getORCID().matcher(text);
                 DMStaff dmStaff = new DMStaff();
-                if(mORCID.matches()){ // DMStaff orcid?
-                    String id = mORCID.group(1);
-                    dmStaff.setUserID(new User_Id(id));
+                Matcher mURLo = Patterns.getURL().matcher(text);
+                if (mURLo.find()) { // DMStaff orcid url?
+                    String id = mURLo.group(1);
+                    logger.info("url matches: " + id);
+                    dmStaff.setUserID(new User_Id(id, "HTTP-ORCID"));
                     text = text.replace(id, "");
+                } else {
+                    Matcher mORCID = Patterns.getORCID().matcher(text);
+                    if (mORCID.find()) { // DMStaff orcid only?
+                        String id = mORCID.group(1);
+                        logger.info("orcid matches: " + id);
+                        dmStaff.setUserID(new User_Id(id));
+                        text = text.replace(id, "");
+                    }
                 }
                 Matcher mMail = Patterns.getMail().matcher(text);
-                if(mMail.matches()){ // DMStaff mail?
+                if (mMail.find()) { // DMStaff mail?
                     String mail = mMail.group(1);
+                    logger.info("mail matches: " + mail);
                     dmStaff.setMbox(mail);
                     text = text.replace(mail, "");
                 }
+                text = text.trim();
                 dmStaff.setName(text);
+                List<DMStaff> dmStaffs = new ArrayList<>();
+                dmStaffs.add(dmStaff);
+                dmp.setDmStaff(dmStaffs);
+                break;
+            case 36:
+                ds.setPreservationStatement(text);
+                break;
+            case 37:
+                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("DataSecurity", text));
+                break;
+            case 38:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_stored_securely")));
+                break;
+            case 39:
+                Matcher mURL = Patterns.getURL().matcher(text);
+                if (mURL.matches()) {
+                    String url = mURL.group(1);
+                    dmp.setEthicalIssuesReport(url);
+                    text = text.replace(url, "");
+                }
+                if (text.toLowerCase().contains(TFAnswer.yes.name())) {
+                    dmp.setEthicalIssuesExist(TFAnswer.yes.name());
+                    text = text.toLowerCase().replace(TFAnswer.yes.name(), "");
+                } else if (text.toLowerCase().contains(TFAnswer.no.name())) {
+                    dmp.setEthicalIssuesExist(TFAnswer.no.name());
+                    text = text.toLowerCase().replace(TFAnswer.no.name(), "");
+                } else {
+                    dmp.setEthicalIssuesExist(TFAnswer.unknown.name());
+                }
+                dmp.setEthicalIssuesDescription(text);
+                break;
+            case 40:
+                if (dmp.getEthicalIssuesReport() == null || dmp.getEthicalIssuesReport().isEmpty()) {
+                    Matcher mURLrep = Patterns.getURL().matcher(text);
+                    if (mURLrep.matches()) {
+                        String url = mURLrep.group(1);
+                        dmp.setEthicalIssuesReport(url);
+                    }
+                }
+                break;
+            case 41:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("personal_data_sharing_consent")));
+                break;
+            case 42:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_management_procedures")));
                 break;
         }
     }

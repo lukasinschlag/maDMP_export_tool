@@ -1,5 +1,7 @@
 # maDMP_export_tool
 
+In this project the RDA DMP Common Standard was evaluated by mapping it to funder templates and by implementing a tool
+that exports information from existing DMP tools into maDMP format.
 
 # Mapping of questions to maDMP fields
 ## Horizon 2020
@@ -102,65 +104,64 @@ interoperability?
 
 #### Increase data re-use (through clarifying licenses) ####
 - How will the data be licensed to permit the widest re-use possible?
--> License:licence_ref
+`License:licence_ref`
 
 - When will the data be made available for re-use? If an embargo is sought to give time to publish or seek patents, specify why and how long this will apply, bearing in mind that research data should be made available as soon as possible.
--> Licence:startDate
+`Licence:startDate`
 
 - Are the data produced and/or used in the project useable by third parties, in particular after the end of the
 project? If the re-use of some data is restricted, explain why. 
--> Distribution:dataAccess
+`Metadata:data_reusable`
 
 - How long is it intended that the data remains re-usable?
--> Distribution:availableTill
+`Distribution:availableTill`
 
 - Are data quality assurance processes described?
--> Dataset:dataQualityAssurance
-
-- Further to the FAIR principles, DMPs should also address:
--> TODO??
+`Dataset:dataQualityAssurance`
 
 ### Allocation of resources ###
 -  What are the costs for making data FAIR in your project?
--> Cost:costType
--> Cost:costValue
--> Cost:costUnit
+`Cost:costValue`
+`Cost:costUnit`
 
 - How will these be covered? Note that costs related to open access to research data are eligible as part of the Horizon 2020 grant (if compliant with the Grant Agreement conditions).
--> Funding:funderID
+`Funding:funderID`
 
 - Who will be responsible for data management in your project?
--> DMStaff:name/mbox/userID
+`DMStaff:name`
+`DMStaff:mbox`
+`DMStaff:userID`
 
 - Are the resources for long term preservation discussed (costs and potential value, who decides and how what
 data will be kept and for how long)?
--> Dataset:PreservationStatement
+`Dataset:preservationStatement`
 
 ### Data security ###
 - What provisions are in place for data security (including data recovery as well as secure storage and transfer of
 sensitive data)?
--> SecurityAndPrivacy:String/description
+`SecurityAndPrivacy:DataSecurity`
 
 - Is the data safely stored in certified repositories for long term preservation and curation?
--> Host:Title
+`Metadata:data_stored_securely`
 
 ### Ethical aspects ###
 - Are there any ethical or legal issues that can have an impact on data sharing? These can also be discussed in
 the context of the ethics review. If relevant, include references to ethics deliverables and ethics chapter in the
 Description of the Action (DoA).
--> Dataset:ethicalIssuesExist
--> Dataset:ethicalIssuesReport
--> Dataset:ethicalIssuesDescription
+`DMP:ethicalIssuesExist`
+`DMP:ethicalIssuesReport`
+`DMP:ethicalIssuesDescription`
 
 - Projects participating to the ORDP might present information relevant to the ethical aspects (data protection) in the DMP. In such a case, the ethics chapter of the DoA may simply refer to the DMP for more information on the details of the ethics aspects related to data. 
--> Dataset:ethicalIssuesReport
+`DMP:ethicalIssuesReport`
 
 - Is informed consent for data sharing and long term preservation included in questionnaires dealing with personal data?
--> Dataset:personalData
+`Metadata:personal_data_sharing_consent`
 
 ### Other ###
 - Do you make use of other national/funder/sectorial/departmental procedures for data management? If yes, which ones?
--> DEFUQ?? TODO
+`Metadata:data_management_procedures`
+
 
 
 ## FWF  
@@ -170,7 +171,7 @@ Description of the Action (DoA).
 `DMPStaff:name`  
 `DMPStaff:mbox`
 
-**Data characteristics**
+### Data characteristics ###
 
 - What kinds of data/source code will be generated or reused (type, format, volume)?  
 `Dataset:type`   
@@ -206,7 +207,7 @@ Description of the Action (DoA).
 - How will the consistency and quality of data collection be controlled and documented? (This may include processes such as repeat samples or measurements, standardised data capture, peer review of data or representation with controlled vocabularies.)  
 `Dataset:dataQualityAssurance` 
 
-**Data Availability and Storage**
+### Data Availability and Storage ###
 
 - How and when will the data be shared and made accessible?  
 `Distribution:DataAccess`  
@@ -244,7 +245,7 @@ Description of the Action (DoA).
 - Are there any technical barriers to making the research data fully or partially accessible?  
 `Metadata: IT:TechnicalBarriers`  
 
-**Legal and Ethical Aspects**
+### Legal and Ethical Aspects ###
 
 - Are there any legal barriers to making the research data fully or partially accessible?  
 `Dataset:personalData`   
@@ -267,4 +268,21 @@ Description of the Action (DoA).
 - If applicable, how are you planning to deal with sensitive data during and after the project?  
 `SecurityAndPrivacy:title`   
 `SecurityAndPrivacy:desc`   
+
+
+
+
+# How the Tool works and its Configuration
+
+To run the tool first a connection to the mysql database has to be made. Therefore, go to the ```src\main\resources\application.properties``` file. Here you find three values to configure:
+```
+spring.datasource.url=jdbc:mysql://localhost:3306/DATABASE-NAME?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Vienna
+spring.datasource.username=DATABASE-USERNAME
+spring.datasource.password=DATABASE-USERPASSWORD
+```
+Replace ```DATABASE-NAME``` with the name given to the Roadmap database. Then set the username and the (if required) password.
+
+With this the configuration is done. Upon starting the application a website under ```localhost:8080``` can be accessed. 
+
+Here all available DMPs are represented. Simply click the Download button to get the maDMP.
 
