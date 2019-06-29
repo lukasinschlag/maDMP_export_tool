@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface AnswersRepository extends CrudRepository<Answer, Integer> {
 
-    List<Answer> findAllByPlan_id(int id);
+    List<Answer> findAllByPlanId(int id);
 
-    Answer findFirstByPlan_id(int id);
+    Answer findFirstByPlanId(int id);
 }

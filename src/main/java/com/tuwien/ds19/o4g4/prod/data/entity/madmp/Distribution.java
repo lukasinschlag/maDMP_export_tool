@@ -29,7 +29,7 @@ public class Distribution {
     }
 
     public void setDescription(String description) {
-        if (this.description.isEmpty()) {
+        if (this.description == null || this.description.isEmpty()) {
             this.description = description;
         } else {
             this.description = this.description + ", " + description;

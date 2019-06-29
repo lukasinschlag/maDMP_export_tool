@@ -1,5 +1,7 @@
 package com.tuwien.ds19.o4g4.prod.data.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -11,7 +13,9 @@ public class Answer {
     @Id
     private int id;
     private String text;
-    private int plan_id;
+
+    @SerializedName("plan_id")
+    private int planId;
     private int user_id;
     private int question_id;
 
@@ -31,12 +35,12 @@ public class Answer {
         this.text = text;
     }
 
-    public int getPlan_id() {
-        return plan_id;
+    public int getPlanId() {
+        return planId;
     }
 
-    public void setPlan_id(int plan_id) {
-        this.plan_id = plan_id;
+    public void setPlanId(int planId) {
+        this.planId = planId;
     }
 
     public int getUser_id() {
@@ -60,7 +64,7 @@ public class Answer {
         return "Answer{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", plan_id=" + plan_id +
+                ", planId=" + planId +
                 ", user_id=" + user_id +
                 ", question_id=" + question_id +
                 '}';

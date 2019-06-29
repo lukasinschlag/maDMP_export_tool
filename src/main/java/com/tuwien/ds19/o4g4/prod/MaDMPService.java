@@ -10,16 +10,22 @@ import com.tuwien.ds19.o4g4.prod.data.entity.Plan;
 import com.tuwien.ds19.o4g4.prod.util.DataAccessType;
 import com.tuwien.ds19.o4g4.prod.util.TFAnswer;
 import com.tuwien.ds19.o4g4.prod.util.TypeIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class MaDMPService {
 
     private final AnswersRepository answersRepository;
+
+    private Logger logger = LoggerFactory.getLogger(MaDMPService.class);
 
     public MaDMPService(AnswersRepository answersRepository) {
         this.answersRepository = answersRepository;
@@ -50,7 +56,7 @@ public class MaDMPService {
     }
 
     private void parseAnswers(Plan p, DMP dmp) {
-        List<Answer> answers = answersRepository.findAllByPlan_id(p.getId());
+        List<Answer> answers = answersRepository.findAllByPlanId(p.getId());
 
         // check if this plan is from Horizon 2020 or FWF template
         int q_id = answers.get(0).getQuestion_id();
@@ -76,8 +82,7 @@ public class MaDMPService {
 
         switch (HorizonTemplateConfig.QUESTIONS_MAP.get(a.getQuestion_id())) {
             case 1:
-            case 4:
-                ds.setDescription(text);
+                dmp.getProject().get(0).setDescription(text);
                 break;
             case 2:
                 for (Dataset.DatasetTypeEnum dt : Dataset.DatasetTypeEnum.values()) {
@@ -92,8 +97,15 @@ public class MaDMPService {
                 }
                 break;
             case 3:
-                dist.setAccessURL(text);
-                dist.setDownloadURL(text);
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("reuse_existing_data")));
+                break;
+            case 4:
+                Pattern p = Pattern.compile("((https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])");
+                Matcher m = p.matcher(text);
+                if(m.matches()) {
+                    dist.setAccessURL(m.group(1));
+                    dist.setDownloadURL(m.group(1));
+                }
                 break;
             case 5:
                 int size = Integer.parseInt(text.replaceAll("[^0-9]", ""));
@@ -110,7 +122,9 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("useful_to")));
                 break;
             case 7:
-                Dataset_Id dataset_id = new Dataset_Id(text);
+                Pattern pattern = Pattern.compile("(10.\\d{4,9}.[\\w.-]+)");
+                Matcher matcher = pattern.matcher(text);
+                Dataset_Id dataset_id = new Dataset_Id(matcher.find()? matcher.group(1) : text);
                 dataset_id.setdataset_id_type(TypeIdentifier.checkType(text));
                 ds.setDataset_id(dataset_id);
                 break;
@@ -169,26 +183,33 @@ public class MaDMPService {
                 break;
             case 15:
             case 16:
-            case 17:
                 ds.getTechnicalResource().add(new TechnicalResource(text, new TextType_Id("software_tools")));
+                break;
+            case 17:
+                ds.getTechnicalResource().add(new TechnicalResource("relevant software included: " + text,
+                        new TextType_Id("software_tools")));
                 break;
             case 18:
                 dist.getHost().setTitle(text);
                 break;
             case 19:
-                dist.getHost().setDescription(text);
+                dist.getHost().setDescription("Appropriate arrangements with the identified repository explored:" + text);
                 break;
             case 20:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("access_provided")));
+                break;
             case 21:
-                dist.setDescription(text);
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_access_committee_needed")));
                 break;
             case 22:
             case 23:
                 ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("AccessAuthorization", text));
                 break;
             case 26:
-            case 27:
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("standard_vocabulary")));
+                break;
+            case 27:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("ontology_mappings")));
                 break;
         }
     }
