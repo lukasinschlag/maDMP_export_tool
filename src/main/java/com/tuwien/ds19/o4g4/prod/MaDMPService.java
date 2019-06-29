@@ -278,6 +278,7 @@ public class MaDMPService {
                     dmStaff.setMbox(mail);
                     text = text.replace(mail, "");
                 }
+                text = text.trim();
                 dmStaff.setName(text);
                 List<DMStaff> dmStaffs = new ArrayList<>();
                 dmStaffs.add(dmStaff);
