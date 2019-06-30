@@ -131,6 +131,7 @@ public class MaDMPService {
                 break;
             case 9:
                 if (text.contains(",")) {
+
                     ds.setKeyword(Arrays.asList(text.trim().split("\\s*,\\s*")));
                 } else if (text.contains(";")) {
                     ds.setKeyword(Arrays.asList(text.trim().split("\\s*;\\s*")));
@@ -246,6 +247,8 @@ public class MaDMPService {
                 } else if (text.contains("$") || text.toLowerCase().contains("usd")) {
                     cost.setCostUnit("USD");
                 }
+                text = text.replaceAll("\\D+","");
+                cost.setCostValue(Double.parseDouble(text));
                 List<Cost> costs = new ArrayList<>();
                 costs.add(cost);
                 dmp.setCost(costs);
