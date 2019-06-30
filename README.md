@@ -287,6 +287,9 @@ Here all available DMPs are represented. Simply click the Download button to get
 ## Links
 
 [Link to the exported maDMPs for the DMP tool](https://github.com/lukasinschlag/maDMP_export_tool/tree/master/maDMPs)
+
 [Link to the code](https://github.com/lukasinschlag/maDMP_export_tool)
+
 [Link to the license](https://github.com/lukasinschlag/maDMP_export_tool/blob/master/LICENSE)
+
 
