@@ -268,7 +268,6 @@ Description of the Action (DoA).
 
 
 
-
 # How the Tool works and its Configuration
 
 To run the tool first a connection to the mysql database has to be made. Therefore, go to the ```src\main\resources\application.properties``` file. Here you find three values to configure:
@@ -282,4 +281,15 @@ Replace ```DATABASE-NAME``` with the name given to the Roadmap database. Then se
 With this the configuration is done. Upon starting the application a website under ```localhost:8080``` can be accessed. 
 
 Here all available DMPs are represented. Simply click the Download button to get the maDMP.
+
+![Screen](docs/tool_screen.jpg?raw=true "maDMP_export_tool")
+
+## Links
+
+[Link to the exported maDMPs for the DMP tool](https://github.com/lukasinschlag/maDMP_export_tool/tree/master/maDMPs)
+
+[Link to the code](https://github.com/lukasinschlag/maDMP_export_tool)
+
+[Link to the license](https://github.com/lukasinschlag/maDMP_export_tool/blob/master/LICENSE)
+
 
