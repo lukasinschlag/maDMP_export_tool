@@ -246,6 +246,9 @@ public class MaDMPService {
                 } else if (text.contains("$") || text.toLowerCase().contains("usd")) {
                     cost.setCostUnit("USD");
                 }
+                List<Cost> costs = new ArrayList<>();
+                costs.add(cost);
+                dmp.setCost(costs);
                 break;
             case 34:
                 Funding funding = new Funding();
@@ -456,6 +459,10 @@ public class MaDMPService {
                 }
                 text = text.replaceAll("\\D+","");
                 cost.setCostValue(Double.parseDouble(text));
+
+                List<Cost> costs = new ArrayList<>();
+                costs.add(cost);
+                dmp.setCost(costs);
                 break;
             case 62:
                 ds.setDescription(text);
