@@ -12,7 +12,7 @@ that exports information from existing DMP tools into maDMP format.
 
 - What types and formats of data will the project generate/collect?  
 `Dataset:type`  
-`Dataset:format`
+`Distribution:format`
 
 - Will you re-use any existing data and how?  
 `Metadata:reuse_existing_data`
