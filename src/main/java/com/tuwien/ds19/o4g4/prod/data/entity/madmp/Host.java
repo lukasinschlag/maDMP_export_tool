@@ -5,6 +5,7 @@ public class Host {
     private String title;
     private String description;
     private String storage_type;
+    private String backup_type;
     private String supports_versioning;
 
     public String getTitle() {
@@ -37,5 +38,13 @@ public class Host {
 
     public void setSupports_versioning(String supports_versioning) {
         this.supports_versioning = supports_versioning;
+    }
+
+    public String getBackup_type() {
+        return backup_type;
+    }
+
+    public void setBackup_type(String backup_type) {
+        this.backup_type = backup_type;
     }
 }

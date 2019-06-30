@@ -283,6 +283,7 @@ public class MaDMPService {
                 }
                 text = text.trim();
                 dmStaff.setName(text);
+                dmStaff.setContributerType("Data officer");
                 List<DMStaff> dmStaffs = new ArrayList<>();
                 dmStaffs.add(dmStaff);
                 dmp.setDmStaff(dmStaffs);
@@ -341,12 +342,32 @@ public class MaDMPService {
 
         switch (FWFTemplateConfig.QUESTIONS_MAP.get(a.getQuestion_id())) {
             case 43:
-                String[] split = text.split("/");
                 DMStaff dmStaff = new DMStaff();
-                dmStaff.setName(split[0]);
-                dmStaff.setMbox(split[1]);
+                Matcher mURLo = Patterns.getURL().matcher(text);
+                if (mURLo.find()) { // DMStaff orcid url?
+                    String id = mURLo.group(1);
+                    logger.info("url matches: " + id);
+                    dmStaff.setUserID(new User_Id(id, "HTTP-ORCID"));
+                    text = text.replace(id, "");
+                } else {
+                    Matcher mORCID = Patterns.getORCID().matcher(text);
+                    if (mORCID.find()) { // DMStaff orcid only?
+                        String id = mORCID.group(1);
+                        logger.info("orcid matches: " + id);
+                        dmStaff.setUserID(new User_Id(id));
+                        text = text.replace(id, "");
+                    }
+                }
+                Matcher mMail = Patterns.getMail().matcher(text);
+                if (mMail.find()) { // DMStaff mail?
+                    String mail = mMail.group(1);
+                    logger.info("mail matches: " + mail);
+                    dmStaff.setMbox(mail);
+                    text = text.replace(mail, "");
+                }
+                text = text.trim();
+                dmStaff.setName(text);
                 dmStaff.setContributerType("Data officer");
-
                 List<DMStaff> dmStaffs = new ArrayList<>();
                 dmStaffs.add(dmStaff);
                 dmp.setDmStaff(dmStaffs);
@@ -421,21 +442,21 @@ public class MaDMPService {
             case 58:
                 String[] s = text.split(";");
                 if (text.toLowerCase().contains(dist.getHost().getTitle().toLowerCase())) {
-                    dist.getHost().setStorage_type(s[1]);
+                    dist.getHost().setStorage_type(s[0]);
                     dist.setDescription("This distribution stores data during the research.");
                 } else {
                     Distribution distribution = new Distribution();
                     distribution.setDescription("This distribution stores data during the research.");
-                    distribution.getHost().setTitle(s[0]);
-                    distribution.getHost().setStorage_type(s[1]);
+                    distribution.getHost().setTitle(s[1]);
+                    distribution.getHost().setBackup_type(s[0]);
                     ds.getDistribution().add(distribution);
                 }
                 break;
             case 59:
                 boolean distAlreadyExists = false;
                 for(Distribution d : ds.getDistribution()) {
-                    if (text.toLowerCase().contains(dist.getHost().getTitle().toLowerCase())) {
-                        dist.setDescription("This distribution stores data after the project ends.");
+                    if (text.toLowerCase().contains(d.getHost().getTitle().toLowerCase())) {
+                        d.setDescription("This distribution stores data after the project ends.");
                         distAlreadyExists = true;
                     }
                 }
@@ -490,12 +511,13 @@ public class MaDMPService {
                 break;
             case 66:
                 Matcher mURI = Patterns.getURI().matcher(text);
-                Distribution tempDist = ds.getDistribution().get(ds.getDistribution().size() - 1);
-                if (mURI.matches()) {
-                    if (tempDist.getLicense().isEmpty()) {
-                        tempDist.getLicense().add(new License());
+                for (Distribution d : ds.getDistribution()) {
+                    if (d.getDescription().contains("after the project ends") && mURI.matches()) {
+                        if (d.getLicense().isEmpty()) {
+                            d.getLicense().add(new License());
+                        }
+                        d.getLicense().get(0).setLicense_ref(mURI.group(1));
                     }
-                    tempDist.getLicense().get(0).setLicense_ref(mURI.group(1));
                 }
                 break;
             case 67:
@@ -520,7 +542,7 @@ public class MaDMPService {
                 dmp.setEthicalIssuesDescription(text);
                 break;
             case 69:
-                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("SensitiveDataStatment", text));
+                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("SensitiveDataStatement", text));
                 break;
         }
     }

@@ -185,21 +185,21 @@ Description of the Action (DoA).
 `Dataset:description` 
 
 - Who is the target audience?  
-`Metadata: IT:TargeAudience` 
+`Metadata:targe_audience` 
 
 **Documentation and Metadata**
 
 - What metadata standards (if any) will be in use and why? (see Digital Curation Centre)  
-`Metadata: IT:MetadataStandard` 
+`Metadata:metadata_standard` 
 
 - What information is needed for the data to be findable, accessible, interoperable and re-usable (FAIR) in the future?  
-`Metadata: IT:make_data_FAIR` 
+`Metadata:make_data_FAIR` 
 
 - Is the data machine-readable?  
-`Metadata: IT:machine_readable` 
+`Metadata:machine_readable` 
 
 - How are you planning to document this information?  
-`Metadata: IT:information_documentation`  
+`Metadata:information_documentation`  
 
 - What quality assurance processes will you adopt?  
 `Dataset:dataQualityAssurance` 
@@ -240,7 +240,7 @@ Description of the Action (DoA).
 `Dataset:description`  
 
 - Are there any technical barriers to making the research data fully or partially accessible?  
-`Metadata: IT:technical_barriers`  
+`Metadata:technical_barriers`  
 
 ### Legal and Ethical Aspects ###
 
@@ -249,13 +249,13 @@ Description of the Action (DoA).
 `Dataset:sensitiveData`  
 
 - Who owns the data?  
-`Metadata: IT:owner_statement`   
+`Metadata:owner_statement`   
 
 - What licence for reuse are you planning to attach to the data?  
 `Licence:ref`   
 
 - Are there any restrictions on the re-use of the data? If so, why?   
-`Metadata: IT:data_reuse_restrictions`   
+`Metadata:data_reuse_restrictions`   
 
 - Are there any ethical barriers to making the research data fully or partially accessible?  
 `DMP:ethicalIssuesExist`   
