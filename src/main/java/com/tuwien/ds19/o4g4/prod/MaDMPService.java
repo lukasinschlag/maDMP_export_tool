@@ -2,6 +2,7 @@ package com.tuwien.ds19.o4g4.prod;
 
 import com.google.gson.Gson;
 import com.joestelmach.natty.Parser;
+import com.tuwien.ds19.o4g4.prod.config.FWFTemplateConfig;
 import com.tuwien.ds19.o4g4.prod.config.HorizonTemplateConfig;
 import com.tuwien.ds19.o4g4.prod.data.AnswersRepository;
 import com.tuwien.ds19.o4g4.prod.data.DMPJSON;
@@ -21,7 +22,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class MaDMPService {
@@ -71,8 +71,13 @@ public class MaDMPService {
             for (Answer a : answers) {
                 parseH2020Answer(a, dmp, ds, dst);
             }
-        } else if (false) { // TODO FWF
-
+        } else if (q_id >= FWFTemplateConfig.QUESTION_ID_RANGE_START &&
+                q_id <= FWFTemplateConfig.QUESTION_ID_RANGE_END) {
+            Dataset ds = dmp.getDataset().get(0);
+            Distribution dst = ds.getDistribution().get(0);
+            for (Answer a : answers) {
+                parseFWFAnswer(a, dmp, ds, dst);
+            }
         }
     }
 
@@ -110,15 +115,7 @@ public class MaDMPService {
                 }
                 break;
             case 5:
-                int size = Integer.parseInt(text.replaceAll("[^0-9]", ""));
-                if (text.toLowerCase().contains("kb")) {
-                    size = size * 1024;
-                } else if (text.toLowerCase().contains("mb")) {
-                    size = size * 1024 * 1024;
-                } else if (text.toLowerCase().contains("gb")) {
-                    size = size * 1024 * 1024 * 1024;
-                }
-                dist.setByteSize(size);
+                dist.setByteSize(getByteSize(text));
                 break;
             case 6:
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("useful_to")));
@@ -327,6 +324,207 @@ public class MaDMPService {
                 ds.getMetadata().add(new Metadata(text, new TextType_Id("data_management_procedures")));
                 break;
         }
+    }
+
+    private void parseFWFAnswer(Answer a, DMP dmp, Dataset ds, Distribution dist){
+        String text = a.getText();
+
+        if(text.isEmpty()){
+            return;
+        }
+
+        switch (FWFTemplateConfig.QUESTIONS_MAP.get(a.getQuestion_id())) {
+            case 43:
+                String[] split = text.split("/");
+                DMStaff dmStaff = new DMStaff();
+                dmStaff.setName(split[0]);
+                dmStaff.setMbox(split[1]);
+                dmStaff.setContributerType("Data officer");
+
+                List<DMStaff> dmStaffs = new ArrayList<>();
+                dmStaffs.add(dmStaff);
+                dmp.setDmStaff(dmStaffs);
+                break;
+            case 44:
+                for (Dataset.DatasetTypeEnum dt : Dataset.DatasetTypeEnum.values()) {
+                    if (text.toLowerCase().contains(dt.name())) {
+                        ds.setType(dt.name());
+                    }
+                }
+                for (Distribution.DatasetFormat df : Distribution.DatasetFormat.values()) {
+                    if (text.toLowerCase().contains(df.name())) {
+                        dist.setFormat(df.name());
+                    }
+                }
+                dist.setByteSize(getByteSize(text));
+                break;
+            case 45:
+                ds.setDescription("Methods for data generation: " + text);
+                break;
+            case 46:
+                ds.setDescription("Datastructure and version-handling: " + text);
+                break;
+            case 47:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("target_audience")));
+                break;
+            case 48:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("metadata_standard")));
+                break;
+            case 49:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("make_data_FAIR")));
+                break;
+            case 50:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("machine_readable")));
+                break;
+            case 51:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("information_documentation")));
+                break;
+            case 52:
+                ds.setDataQualityAssurance(text);
+                break;
+            case 53:
+                ds.setDataQualityAssurance(text);
+                break;
+            case 54:
+                List<Date> dates = new Parser().parse(text).get(0).getDates();
+                if (dist.getLicense().isEmpty()) {
+                    dist.getLicense().add(new License());
+                }
+                dist.getLicense().get(0).setStartDate(dates.get(0));
+
+                if (text.toLowerCase().contains(DataAccessType.open.name())) {
+                    dist.setData_access(DataAccessType.open.name());
+                } else if (text.toLowerCase().contains(DataAccessType.closed.name())) {
+                    dist.setData_access(DataAccessType.closed.name());
+                } else if (text.toLowerCase().contains(DataAccessType.shared.name())) {
+                    dist.setData_access(DataAccessType.shared.name());
+                }
+                break;
+            case 55:
+                dist.getHost().setTitle(text);
+                break;
+            case 56:
+                Matcher matcher = Patterns.getDOI().matcher(text);
+                Dataset_Id dataset_id = new Dataset_Id(matcher.find() ? matcher.group(1) : text);
+                dataset_id.setdataset_id_type(TypeIdentifier.checkType(text));
+                ds.setDataset_id(dataset_id);
+                break;
+            case 57:
+                ds.setPreservationStatement(text);
+                break;
+            case 58:
+                String[] s = text.split(";");
+                if (text.toLowerCase().contains(dist.getHost().getTitle().toLowerCase())) {
+                    dist.getHost().setStorage_type(s[1]);
+                    dist.setDescription("This distribution stores data during the research.");
+                } else {
+                    Distribution distribution = new Distribution();
+                    distribution.setDescription("This distribution stores data during the research.");
+                    distribution.getHost().setTitle(s[0]);
+                    distribution.getHost().setStorage_type(s[1]);
+                    ds.getDistribution().add(distribution);
+                }
+                break;
+            case 59:
+                boolean distAlreadyExists = false;
+                for(Distribution d : ds.getDistribution()) {
+                    if (text.toLowerCase().contains(dist.getHost().getTitle().toLowerCase())) {
+                        dist.setDescription("This distribution stores data after the project ends.");
+                        distAlreadyExists = true;
+                    }
+                }
+                if (!distAlreadyExists) {
+                    ds.getDistribution().get(ds.getDistribution().size() - 1).setAvailableTill(dmp.getProject().get(0).getProjectEnd());
+                    Distribution distribution = new Distribution();
+                    distribution.setDescription("This distribution stores data after the project ends.");
+                    distribution.getHost().setTitle(text);
+                    ds.getDistribution().add(distribution);
+                }
+                break;
+            case 60:
+                List<Date> dates2 = new Parser().parse(text).get(0).getDates();
+                if (!dates2.isEmpty()) {
+                    ds.getDistribution().get(ds.getDistribution().size() - 1).setAvailableTill(dates2.get(0));
+                }
+                break;
+            case 61:
+                Cost cost = new Cost("Cost for storing data.");
+                if (text.contains("€") || text.toLowerCase().contains("eur")) {
+                    cost.setCostUnit("EUR");
+                } else if (text.contains("$") || text.toLowerCase().contains("usd")) {
+                    cost.setCostUnit("USD");
+                }
+                text = text.replaceAll("\\D+","");
+                cost.setCostValue(Double.parseDouble(text));
+                break;
+            case 62:
+                ds.setDescription(text);
+                break;
+            case 63:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("technical_barriers")));
+                break;
+            case 64:
+                if (text.toLowerCase().contains("personal")) {
+                    ds.setPersonalData(TFAnswer.yes.name());
+                } else {
+                    ds.setPersonalData(TFAnswer.unknown.name());
+                    if (text.toLowerCase().contains("sensitive")) {
+                        ds.setSensitiveData(TFAnswer.yes.name());
+                    } else {
+                        ds.setSensitiveData(TFAnswer.unknown.name());
+                    }
+                }
+                break;
+            case 65:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("owner_statement")));
+                break;
+            case 66:
+                Matcher mURI = Patterns.getURI().matcher(text);
+                Distribution tempDist = ds.getDistribution().get(ds.getDistribution().size() - 1);
+                if (mURI.matches()) {
+                    if (tempDist.getLicense().isEmpty()) {
+                        tempDist.getLicense().add(new License());
+                    }
+                    tempDist.getLicense().get(0).setLicense_ref(mURI.group(1));
+                }
+                break;
+            case 67:
+                ds.getMetadata().add(new Metadata(text, new TextType_Id("data_reuse_restrictions")));
+                break;
+            case 68:
+                Matcher mURL = Patterns.getURL().matcher(text);
+                if (mURL.matches()) {
+                    String url = mURL.group(1);
+                    dmp.setEthicalIssuesReport(url);
+                    text = text.replace(url, "");
+                }
+                if (text.toLowerCase().contains(TFAnswer.yes.name())) {
+                    dmp.setEthicalIssuesExist(TFAnswer.yes.name());
+                    text = text.toLowerCase().replace(TFAnswer.yes.name(), "");
+                } else if (text.toLowerCase().contains(TFAnswer.no.name())) {
+                    dmp.setEthicalIssuesExist(TFAnswer.no.name());
+                    text = text.toLowerCase().replace(TFAnswer.no.name(), "");
+                } else {
+                    dmp.setEthicalIssuesExist(TFAnswer.unknown.name());
+                }
+                dmp.setEthicalIssuesDescription(text);
+                break;
+            case 69:
+                ds.getSecurityAndPrivacy().add(new SecurityAndPrivacy("SensitiveDataStatment", text));
+                break;
+        }
+    }
+
+    private int getByteSize(String text){
+        int size = Integer.parseInt(text.replaceAll("[^0-9]", ""));
+        if (text.toLowerCase().contains("kb")) {
+            size = size * 1024;
+        } else if (text.toLowerCase().contains("mb")) {
+            size = size * 1024 * 1024;
+        } else if (text.toLowerCase().contains("gb")) {
+            size = size * 1024 * 1024 * 1024;
+        }
+        return size;
     }
 
     private void setContact(Plan p, DMP dmp) {

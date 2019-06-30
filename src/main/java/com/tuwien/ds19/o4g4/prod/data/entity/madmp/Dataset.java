@@ -80,7 +80,11 @@ public class Dataset {
     }
 
     public void setDataQualityAssurance(String dataQualityAssurance) {
-        this.dataQualityAssurance = dataQualityAssurance;
+        if (this.dataQualityAssurance == null || this.dataQualityAssurance.isEmpty()) {
+            this.dataQualityAssurance = dataQualityAssurance;
+        } else {
+            this.dataQualityAssurance = this.dataQualityAssurance + ", " + dataQualityAssurance;
+        }
     }
 
     public String getPreservationStatement() {
@@ -88,6 +92,7 @@ public class Dataset {
     }
 
     public void setPreservationStatement(String preservationStatement) {
+
         this.preservationStatement = preservationStatement;
     }
 
@@ -139,7 +144,7 @@ public class Dataset {
         this.dataset_id = dataset_id;
     }
 
-    public enum DatasetTypeEnum {
+    public enum  DatasetTypeEnum {
         software, document, questionnaire, interview, observation, measurements, recordings
     }
 }

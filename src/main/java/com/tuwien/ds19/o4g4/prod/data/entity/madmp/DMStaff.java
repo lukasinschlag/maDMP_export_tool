@@ -4,6 +4,7 @@ public class DMStaff {
 
     private String name;
     private String mbox;
+    private String contributerType;
 
     private User_Id userID;
 
@@ -32,5 +33,13 @@ public class DMStaff {
 
     public void setUserID(User_Id userID) {
         this.userID = userID;
+    }
+
+    public String getContributerType() {
+        return contributerType;
+    }
+
+    public void setContributerType(String contributerType) {
+        this.contributerType = contributerType;
     }
 }
